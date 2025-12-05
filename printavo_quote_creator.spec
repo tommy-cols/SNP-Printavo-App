@@ -23,6 +23,7 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
+        # PyQt5 modules you don't use
         'PyQt5.QtBluetooth',
         'PyQt5.QtDBus',
         'PyQt5.QtDesigner',
@@ -50,12 +51,40 @@ a = Analysis(
         'PyQt5.QtWebSockets',
         'PyQt5.QtXml',
         'PyQt5.QtXmlPatterns',
+
+        # Common heavy packages you don't use
         'matplotlib',
         'numpy',
         'scipy',
         'pandas',
         'PIL',
+        'Pillow',
         'tkinter',
+        'PyPDF2',  # You don't actually use this
+
+        # Anthropic SDK extras
+        'anthropic.lib.bedrock',
+        'anthropic.lib.vertex',
+
+        # Zeep (not used at all - remove from requirements.txt too!)
+        'zeep',
+
+        # Requests extras
+        'urllib3.contrib.pyopenssl',
+        'urllib3.contrib.socks',
+        'chardet',
+
+        # Openpyxl extras (you only read, don't create charts/images)
+        'openpyxl.chart',
+        'openpyxl.drawing',
+        'openpyxl.styles.differential',
+
+        # Testing/dev packages
+        'pytest',
+        'unittest',
+        'test',
+        'tests',
+        '_pytest',
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
