@@ -14,8 +14,8 @@ jobs:
       matrix:
         include:
           - os: macos-15-intel
-            artifact_name: PrintavoQuoteCreator-macOS-Intel.zip
-            artifact_path: dist/PrintavoQuoteCreator-macOS-Intel.zip
+            artifact_name: PrintavoQuoteCreator-macOS-Intel.dmg
+            artifact_path: dist/PrintavoQuoteCreator-macOS-Intel.dmg
 
           - os: windows-latest
             artifact_name: PrintavoQuoteCreator-Windows.exe
@@ -40,8 +40,27 @@ jobs:
       run: |
         pip install pyinstaller
         pyinstaller printavo_quote_creator.spec
-        cd dist
-        zip -r PrintavoQuoteCreator-macOS-Intel.zip PrintavoQuoteCreator.app
+
+    - name: Create DMG
+      if: runner.os == 'macOS'
+      run: |
+        brew install create-dmg
+        mkdir -p dist/dmg
+        cp -r "dist/PrintavoQuoteCreator.app" dist/dmg/
+        
+        create-dmg \
+          --volname "Printavo Quote Creator" \
+          --window-pos 200 120 \
+          --window-size 600 400 \
+          --icon-size 100 \
+          --icon "PrintavoQuoteCreator.app" 175 190 \
+          --hide-extension "PrintavoQuoteCreator.app" \
+          --app-drop-link 425 190 \
+          "dist/PrintavoQuoteCreator-macOS-Intel.dmg" \
+          "dist/dmg/" || hdiutil create -volname "Printavo Quote Creator" \
+            -srcfolder "dist/PrintavoQuoteCreator.app" \
+            -ov -format UDZO \
+            "dist/PrintavoQuoteCreator-macOS-Intel.dmg"
 
     - name: Build Windows app
       if: runner.os == 'Windows'
