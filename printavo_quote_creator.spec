@@ -80,7 +80,7 @@ exe = EXE(
     target_arch='x86_64' if sys.platform == 'darwin' else None,  # x86_64 for Mac, auto for Windows
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # Add 'icon.ico' (Windows) or 'icon.icns' (Mac) if you have one
+    icon='icon.icns',  # Add 'icon.ico' (Windows) or 'icon.icns' (Mac) if you have one
 )
 
 # For macOS, create an app bundle
