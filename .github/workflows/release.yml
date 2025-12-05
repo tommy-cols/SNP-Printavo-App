@@ -1,0 +1,50 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-12
+            artifact_name: PrintavoQuoteTool-macOS-Intel
+            artifact_path: dist/PrintavoQuoteTool
+
+          - os: windows-latest
+            artifact_name: PrintavoQuoteTool-Windows.exe
+            artifact_path: dist/PrintavoQuoteTool.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build executable (Mac)
+      if: runner.os == 'macOS'
+      run: pyinstaller --onefile --windowed --name PrintavoQuoteTool main.py
+
+    - name: Build executable (Windows)
+      if: runner.os == 'Windows'
+      run: pyinstaller --onefile --windowed --name PrintavoQuoteTool main.py
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ matrix.artifact_path }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
