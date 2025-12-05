@@ -68,37 +68,44 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
+    # REMOVED: a.binaries, a.zipfiles, a.datas from here (that made it onefile)
     [],
+    exclude_binaries=True,  # KEY CHANGE: This makes it onedir
     name='PrintavoQuoteCreator',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch='x86_64' if sys.platform == 'darwin' else None,
+    target_arch='x86_64',
     codesign_identity=None,
     entitlements_file=None,
-    icon=icon_path if os.path.exists(icon_path) else None,  # Use absolute path
+    icon=icon_path if os.path.exists(icon_path) else None,
 )
 
-# For macOS, create an app bundle
-if sys.platform == 'darwin':
-    app = BUNDLE(
-        exe,
-        name='PrintavoQuoteCreator.app',
-        icon=icon_path if os.path.exists(icon_path) else None,  # Use absolute path
-        bundle_identifier='com.yourcompany.printavoquotecreator',
-        info_plist={
-            'NSPrincipalClass': 'NSApplication',
-            'NSHighResolutionCapable': 'True',
-            'CFBundleShortVersionString': '1.0.0',
-            'LSMinimumSystemVersion': '10.13.0',
-        },
-    )
+# COLLECT bundles everything into a folder
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='PrintavoQuoteCreator',
+)
+
+# Create macOS app bundle
+app = BUNDLE(
+    coll,
+    name='PrintavoQuoteCreator.app',
+    icon=icon_path if os.path.exists(icon_path) else None,
+    bundle_identifier='com.yourcompany.printavoquotecreator',
+    info_plist={
+        'NSPrincipalClass': 'NSApplication',
+        'NSHighResolutionCapable': 'True',
+        'CFBundleShortVersionString': '1.0.0',
+        'LSMinimumSystemVersion': '10.13.0',
+    },
+)

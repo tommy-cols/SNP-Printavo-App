@@ -18,8 +18,8 @@ jobs:
             artifact_path: dist/PrintavoQuoteCreator-macOS-Intel.dmg
 
           - os: windows-latest
-            artifact_name: PrintavoQuoteCreator-Windows.exe
-            artifact_path: dist/PrintavoQuoteCreator.exe
+            artifact_name: PrintavoQuoteCreator-Windows-Setup.exe
+            artifact_path: dist/PrintavoQuoteCreator-Windows-Setup.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -45,8 +45,6 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install create-dmg
-        mkdir -p dist/dmg
-        cp -r "dist/PrintavoQuoteCreator.app" dist/dmg/
         
         create-dmg \
           --volname "Printavo Quote Creator" \
@@ -57,7 +55,7 @@ jobs:
           --hide-extension "PrintavoQuoteCreator.app" \
           --app-drop-link 425 190 \
           "dist/PrintavoQuoteCreator-macOS-Intel.dmg" \
-          "dist/dmg/" || hdiutil create -volname "Printavo Quote Creator" \
+          "dist/PrintavoQuoteCreator.app" || hdiutil create -volname "Printavo Quote Creator" \
             -srcfolder "dist/PrintavoQuoteCreator.app" \
             -ov -format UDZO \
             "dist/PrintavoQuoteCreator-macOS-Intel.dmg"
@@ -67,6 +65,16 @@ jobs:
       run: |
         pip install pyinstaller
         pyinstaller printavo_quote_creator_windows.spec
+
+    - name: Install Inno Setup
+      if: runner.os == 'Windows'
+      run: |
+        choco install innosetup -y
+
+    - name: Create Windows Installer
+      if: runner.os == 'Windows'
+      run: |
+        iscc installer.iss
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v1

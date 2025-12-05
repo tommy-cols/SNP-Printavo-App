@@ -34,10 +34,9 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
+    # REMOVED: a.binaries, a.zipfiles, a.datas from here
     [],
+    exclude_binaries=True,  # KEY CHANGE: This makes it onedir
     name='PrintavoQuoteCreator',
     debug=False,
     bootloader_ignore_signals=False,
@@ -45,11 +44,22 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # No console window for GUI app
+    console=False,
     disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,  # Auto-detect on Windows
+    target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
     icon=icon_path if os.path.exists(icon_path) else None,
+)
+
+# COLLECT bundles everything into a folder
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='PrintavoQuoteCreator',
 )
