@@ -1,6 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 # Windows build spec file
 
+import os
+spec_root = os.path.abspath(SPECPATH)
+icon_path = os.path.join(spec_root, 'icon.ico')
+
 block_cipher = None
 
 a = Analysis(
@@ -47,5 +51,5 @@ exe = EXE(
     target_arch=None,  # Auto-detect on Windows
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # Add 'icon.ico' if you have one
+    icon=icon_path if os.path.exists(icon_path) else None,
 )

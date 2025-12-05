@@ -1,5 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 import sys
+import os
+
+# Get the directory where this spec file is located
+spec_root = os.path.abspath(SPECPATH)
+icon_path = os.path.join(spec_root, 'icon.icns')
 
 block_cipher = None
 
@@ -74,13 +79,13 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # Set to False for GUI app (no console window)
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch='x86_64' if sys.platform == 'darwin' else None,  # x86_64 for Mac, auto for Windows
+    target_arch='x86_64' if sys.platform == 'darwin' else None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon.icns',  # Add 'icon.ico' (Windows) or 'icon.icns' (Mac) if you have one
+    icon=icon_path if os.path.exists(icon_path) else None,  # Use absolute path
 )
 
 # For macOS, create an app bundle
@@ -88,7 +93,7 @@ if sys.platform == 'darwin':
     app = BUNDLE(
         exe,
         name='PrintavoQuoteCreator.app',
-        icon=None,  # Add 'icon.icns' if you have one
+        icon=icon_path if os.path.exists(icon_path) else None,  # Use absolute path
         bundle_identifier='com.yourcompany.printavoquotecreator',
         info_plist={
             'NSPrincipalClass': 'NSApplication',
