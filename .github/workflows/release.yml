@@ -5,18 +5,21 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
       matrix:
         include:
-          - os: macos-13
-            artifact_name: PrintavoQuoteTool-macOS-Intel
-            artifact_path: dist/PrintavoQuoteTool
+          - os: macos-15-intel
+            artifact_name: PrintavoQuoteCreator-macOS-Intel.zip
+            artifact_path: dist/PrintavoQuoteCreator-macOS-Intel.zip
 
           - os: windows-latest
-            artifact_name: PrintavoQuoteTool-Windows.exe
-            artifact_path: dist/PrintavoQuoteTool.exe
+            artifact_name: PrintavoQuoteCreator-Windows.exe
+            artifact_path: dist/PrintavoQuoteCreator.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -30,17 +33,21 @@ jobs:
         python-version: '3.9'
 
     - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install pyinstaller
+      run: pip install -r requirements.txt
 
-    - name: Build executable (Mac)
+    - name: Build macOS app
       if: runner.os == 'macOS'
-      run: pyinstaller --onefile --windowed --name PrintavoQuoteTool main.py
+      run: |
+        pip install pyinstaller
+        pyinstaller printavo_quote_creator.spec
+        cd dist
+        zip -r PrintavoQuoteCreator-macOS-Intel.zip PrintavoQuoteCreator.app
 
-    - name: Build executable (Windows)
+    - name: Build Windows app
       if: runner.os == 'Windows'
-      run: pyinstaller --onefile --windowed --name PrintavoQuoteTool main.py
+      run: |
+        pip install pyinstaller
+        pyinstaller printavo_quote_creator_windows.spec
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
